@@ -19,9 +19,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect('mongodb://localhost:27017/NNPTUD-S2');
+mongoose.connect('mongodb://sa:123456@localhost:27017/NNPTUD-S5?authSource=admin');
 mongoose.connection.on('connected', function () {
-  console.log("da connect");
+  console.log("CONNECTING");
 })
 
 //localhost:3000

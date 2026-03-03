@@ -41,10 +41,13 @@ router.post("/", async function (req, res, next) {
 router.put("/:id", async function (req, res, next) {
     try {
         let id = req.params.id;
-        let updatedItem = await roleModel.findByIdAndUpdate(id, req.body, { new: true });
+        let updatedItem = await roleModel.findOne({ _id: id, isDeleted: false });
         if (!updatedItem) {
             return res.status(404).send({ message: "id not found" });
         }
+        if (req.body.name) updatedItem.name = req.body.name;
+        if (req.body.description !== undefined) updatedItem.description = req.body.description;
+        await updatedItem.save();
         res.send(updatedItem);
     } catch (err) {
         res.status(400).send({ message: err.message });

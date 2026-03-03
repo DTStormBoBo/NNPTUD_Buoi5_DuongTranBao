@@ -5,6 +5,7 @@ let { userPostValidation, validateResult } =
   require('../utils/validationHandler')
 
 let userController = require("../controllers/users");
+let userModel = require("../schemas/users");
 
 
 router.get("/", async function (req, res, next) {
@@ -77,6 +78,62 @@ router.delete("/:id", async function (req, res, next) {
       return res.status(404).send({ message: "id not found" });
     }
     res.send(updatedItem);
+  } catch (err) {
+    res.status(400).send({ message: err.message });
+  }
+});
+
+// POST /enable - Enable user by email and username
+router.post("/enable", async function (req, res, next) {
+  try {
+    let { email, username } = req.body;
+    
+    if (!email || !username) {
+      return res.status(400).send({ message: "Email and username are required" });
+    }
+    
+    let user = await userModel.findOne({ 
+      email: email, 
+      username: username, 
+      isDeleted: false 
+    });
+    
+    if (!user) {
+      return res.status(404).send({ message: "User not found or information is incorrect" });
+    }
+    
+    user.status = true;
+    await user.save();
+    
+    res.send({ message: "User enabled successfully", user: user });
+  } catch (err) {
+    res.status(400).send({ message: err.message });
+  }
+});
+
+// POST /disable - Disable user by email and username
+router.post("/disable", async function (req, res, next) {
+  try {
+    let { email, username } = req.body;
+    
+    if (!email || !username) {
+      return res.status(400).send({ message: "Email and username are required" });
+    }
+    
+    let user = await userModel.findOne({ 
+      email: email, 
+      username: username, 
+      isDeleted: false 
+    });
+    
+    if (!user) {
+      return res.status(404).send({ message: "User not found or information is incorrect" });
+    }
+    
+    user.status = false;
+    await user.save();
+    
+    res.send({ message: "User disabled successfully", user: user });
   } catch (err) {
     res.status(400).send({ message: err.message });
   }
